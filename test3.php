@@ -1,5 +1,5 @@
 <?php
-#ステータスコードを追記する必要あり
+//ステータスコードを追記する必要あり
 //json形式ファイルのheader
 header("Content-Type: application/json; charset=utf-8");
 
@@ -7,11 +7,7 @@ header("Content-Type: application/json; charset=utf-8");
 try{
     $db = new PDO('mysql:dbname=test;host=localhost;charset=utf8','root','root');
     echo "接続OK";
-} catch(PDOException $e) {
-    echo "error".$e->getMessage();
-}
-
-// データベース
+    // データベース
 $data = "user";
 // SQL構文
 $table = "SELECT * FROM $data";
@@ -23,17 +19,19 @@ while($table = $sql -> fetch()) {
 
 }
 
-// URL後のクエリストリング"num"をGET
+// URLを表示
+echo (empty($_SERVER['HTTPS']) ? 'http://' : 'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+$url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
 if(isset($_GET["num"])) {
     // numをエスケープ(xss対策)
     $param = htmlspecialchars($_GET["num"]);
-    // table2に検索するSQL構文
+    //SQL構文
     $table2 = "SELECT user_id, name FROM $data WHERE user_id = $param";
-    // ステータスを配列に追加(キーはstatus)
+    // メイン処理
     $arr["status"] = "yes";
-    // クエリ(問い合わせ)
     $sql2 = $db->query($table2);
-    // データを配列に格納(キーはname)
     while($table2 = $sql2 -> fetch()) {
     $arr["name"] = $table2['name'];
 
@@ -44,8 +42,12 @@ if(isset($_GET["num"])) {
     $arr["status"] = "no";
 }
 
-// 配列をjson形式にデコードして出力, 第二引数以降は、整形するためのオプション
+// 配列をjson形式にデコードして出力, 第二引数は、整形するためのオプション
 print json_encode($arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+} catch(PDOException $e) {
+    echo "error".$e->getMessage();
+}
+
 
 
 
